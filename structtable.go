@@ -110,6 +110,7 @@ type WTableProperties struct {
 	Position      *WTablePositioningProperties
 	Style         *WTableStyle
 	Width         *WTableWidth
+	Layout        *WTableLayout
 	Justification *Justification `xml:"w:jc,omitempty"`
 	TableBorders  *WTableBorders `xml:"w:tblBorders"`
 	Look          *WTableLook
@@ -251,6 +252,28 @@ func (t *WTableStyle) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err 
 		}
 		switch attr.Name.Local {
 		case "val":
+			t.Val = attr.Value
+		default:
+			// ignore other attributes
+		}
+	}
+	// Consume the end element
+	_, err = d.Token()
+	return err
+}
+
+type WTableLayout struct {
+	XMLName xml.Name `xml:"w:tblLayout,omitempty"`
+	Val     string   `xml:"w:type,attr"`
+}
+
+func (t *WTableLayout) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
+	for _, attr := range start.Attr {
+		if attr.Value == "" {
+			continue
+		}
+		switch attr.Name.Local {
+		case "type":
 			t.Val = attr.Value
 		default:
 			// ignore other attributes
